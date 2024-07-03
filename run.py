@@ -4,7 +4,7 @@ import os
 import torch
 from torch.optim import Adam, AdamW
 from torch import nn
-from torch_geometric.data import DataLoader
+from torch_geometric.loader import DataLoader
 import numpy as np
 from torch.autograd import grad
 from torch.utils.tensorboard import SummaryWriter
@@ -84,15 +84,7 @@ def NIG_Reg(y, gamma, v, alpha, beta, w_i_dis, quantile, omega=0.01, reduce=True
 
     return torch.mean(reg) if reduce else reg
 
-def quant_evi_loss(y_true, gamma, v, alpha, beta, quantile=0.5, coeff=1.0, reduce=True):
-    theta = (1.0 - 2.0 * quantile) / (quantile * (1.0 - quantile))
-    mean_ = beta / (alpha - 1)
 
-    w_i_dis = dist.Exponential(rate=1 / mean_)
-    mu = gamma + theta * w_i_dis.mean
-    loss_nll = NIG_NLL(y_true, mu, v, alpha, beta, w_i_dis, quantile, reduce=reduce)
-    loss_reg = NIG_Reg(y_true, gamma, v, alpha, beta, w_i_dis, quantile, reduce=reduce)
-    return loss_nll + coeff * loss_reg
 
 class run():
     r"""
@@ -102,7 +94,7 @@ class run():
         pass
         
     def run(self, device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation, epochs=500, batch_size=32, vt_batch_size=32, lr=0.0005, lr_decay_factor=0.5, lr_decay_step_size=50, weight_decay=0, 
-        energy_and_force=False, p=100, save_dir='', log_dir='', energy_trans=[0, 0, 0], convert=1, mol_name=None):
+        energy_and_force=False, save_dir='', log_dir='', energy_trans=[0, 0, 0], convert=1, LAMBDA = 1, THETA = 0.1, q = 0.4, mol_name=None):
         r"""
         The run script for training and validation.
         
@@ -130,6 +122,7 @@ class run():
 
         model = model.to(device)
         self.convert = convert
+        self.energy_trans = energy_trans
         train_loader = DataLoader(train_dataset, batch_size, shuffle=True)
         valid_loader = DataLoader(valid_dataset, vt_batch_size, shuffle=True)
         test_loader = DataLoader(test_dataset, vt_batch_size, shuffle=False)
@@ -137,7 +130,9 @@ class run():
         best_test = float('inf')
         num_params = sum(p.numel() for p in model.parameters())
         epochs = epochs
+        self.THETA, self.LAMBDA, self.q = THETA, LAMBDA, q
         logging.info(f'#Params: {num_params}')
+        logging.info(f'#HyperParams: theta: {self.THETA}, lambda: {self.LAMBDA}, q: {self.q}')
         logging.info(f'#modle-setting: task_mol:{mol_name},  epochs:{epochs}, train_bs:{batch_size}, infer_bs:{vt_batch_size}, initial_lr:{lr}, convert:{self.convert}, trans:{energy_trans} ' )
         optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
         num_steps = len(train_loader) * epochs
@@ -159,7 +154,7 @@ class run():
         
             # if epoch < (epochs_p):
             #     logging.info(" --------in potential function loss process-------")
-            train_mae,  node_para = self.train(model, optimizer, train_loader, energy_and_force, p, loss_func, device, trans=energy_trans[0])
+            train_mae,  node_para = self.train(model, optimizer, train_loader, energy_and_force, loss_func, device, trans=0)
                 # train_mae,  node_para = 0, (0,0,0,0)
             # else:
             #     if epoch == epochs_p: 
@@ -169,9 +164,9 @@ class run():
             #     train_mae, node_para = self.train(model, optimizer, train_loader, energy_and_force, p, loss_func, device, trans=0)
             #     # train_mae, node_para = 0, (0,0,0,0)
                 
-            valid_mae, energy_mae_val, force_mae_val= self.val(model, valid_loader, energy_and_force, p, evaluation, device,trans=0)
+            valid_mae, energy_mae_val, force_mae_val= self.val(model, valid_loader, energy_and_force, evaluation, device,trans=0)
             # valid_mae, energy_mae_val, force_mae_val = 0, 0, 0
-            test_mae, energy_mae, force_mae= self.test(model, test_loader, energy_and_force, p, evaluation, device, trans=0)
+            test_mae, energy_mae, force_mae= self.test(model, test_loader, energy_and_force, evaluation, device, trans=0)
 
             end = time.time()
             
@@ -249,7 +244,19 @@ class run():
 
         return best_valid
 
-    def train(self, model, optimizer, train_loader, energy_and_force, p, loss_func, device, trans):
+    def quant_evi_loss(self, y_true, gamma, v, alpha, beta, quantile=None, coeff=None, reduce=True):
+        quantile = self.q
+        coeff = self.LAMBDA
+        theta = (1.0 - 2.0 * quantile) / (quantile * (1.0 - quantile))
+        mean_ = beta / (alpha - 1)
+
+        w_i_dis = dist.Exponential(rate=1 / mean_)
+        mu = gamma + theta * w_i_dis.mean
+        loss_nll = NIG_NLL(y_true, mu, v, alpha, beta, w_i_dis, quantile, reduce=reduce)
+        loss_reg = NIG_Reg(y_true, gamma, v, alpha, beta, w_i_dis, quantile, reduce=reduce)
+        return loss_nll + coeff * loss_reg
+
+    def train(self, model, optimizer, train_loader, energy_and_force, loss_func, device, trans):
         r"""
         The script for training.
         
@@ -272,16 +279,15 @@ class run():
             optimizer.zero_grad()
             batch_data = batch_data.to(device)
             if energy_and_force:
-                # print(batch_data)
-                # input()
+                
                 e, force, node_para = model(batch_data)
-                # print(batch_data)
-                # input()
+                e = (e) + self.energy_trans[0]
 
-                e_loss = loss_func(e, batch_data.energy.unsqueeze(1))
-                loss_uncer = quant_evi_loss(batch_data.force[:,0], node_para[0][:,0],node_para[1][:,0],node_para[2][:,0],node_para[3][:,0])+quant_evi_loss(batch_data.force[:,1], node_para[0][:,1],node_para[1][:,1],node_para[2][:,1],node_para[3][:,1])+quant_evi_loss(batch_data.force[:,2], node_para[0][:,2],node_para[1][:,2],node_para[2][:,2],node_para[3][:,2])
+                e_loss = loss_func(e, batch_data.y.unsqueeze(1))
+                loss_uncer = self.quant_evi_loss(batch_data.force[:,0], node_para[0][:,0],node_para[1][:,0],node_para[2][:,0],node_para[3][:,0])+self.quant_evi_loss(batch_data.force[:,1], node_para[0][:,1],node_para[1][:,1],node_para[2][:,1],node_para[3][:,1])+self.quant_evi_loss(batch_data.force[:,2], node_para[0][:,2],node_para[1][:,2],node_para[2][:,2],node_para[3][:,2])
 
-                loss = loss_uncer + 10e-1*e_loss
+                loss = loss_uncer + self.THETA*e_loss
+
 
             else:
                 loss = loss_func(out, batch_data.y.unsqueeze(1))
@@ -293,7 +299,7 @@ class run():
         return loss_accum / (step + 1), node_para
 
 
-    def test(self, model, data_loader, energy_and_force, p, evaluation, device, trans=0):
+    def test(self, model, data_loader, energy_and_force, evaluation, device, trans=0):
         r"""
         The script for validation/test.
         
@@ -323,11 +329,12 @@ class run():
             if energy_and_force:
 
                 e, force_hat, node_para= model(batch_data)
+                e = (e ) + self.energy_trans[2]
                 preds_force = torch.cat([preds_force.float(),force_hat.float().detach()], dim=0)
                 targets_force = torch.cat([targets_force.float(),(batch_data.force).float()], dim=0)
                     
             preds = torch.cat([preds, e.detach()], dim=0)
-            targets = torch.cat([targets, ((batch_data.energy.unsqueeze(1)))], dim=0)
+            targets = torch.cat([targets, ((batch_data.y.unsqueeze(1)))], dim=0)
 
         input_dict = {"y_true": targets.to(torch.float), "y_pred": preds.to(torch.float)}
 
@@ -335,12 +342,12 @@ class run():
             input_dict_force = {"y_true": targets_force.to(torch.float), "y_pred": preds_force.to(torch.float)}
             energy_mae = evaluation.eval(input_dict)['mae']
             force_mae = evaluation.eval(input_dict_force)['mae']
-            return energy_mae + p * force_mae, energy_mae, force_mae
+            return energy_mae + 100 * force_mae, energy_mae, force_mae
 
         return evaluation.eval(input_dict)['mae']
 
 
-    def val(self, model, data_loader, energy_and_force, p, evaluation, device, trans=0):
+    def val(self, model, data_loader, energy_and_force, evaluation, device, trans=0):
         r"""
         The script for validation/test.
         
@@ -369,11 +376,12 @@ class run():
             
             if energy_and_force:
                 e, force_hat, node_para= model(batch_data)
+                e = (e) + self.energy_trans[1]
                 preds_force = torch.cat([preds_force.float(),force_hat.float().detach()], dim=0)
                 targets_force = torch.cat([targets_force.float(),(batch_data.force).float()], dim=0)
                     
             preds = torch.cat([preds, e.detach()], dim=0)
-            targets = torch.cat([targets, (batch_data.energy.unsqueeze(1))], dim=0)
+            targets = torch.cat([targets, (batch_data.y.unsqueeze(1))], dim=0)
 
 
         input_dict = {"y_true": targets.to(torch.float), "y_pred": preds.to(torch.float)}
@@ -384,5 +392,5 @@ class run():
             energy_mae = evaluation.eval(input_dict)['mae']
             force_mae = evaluation.eval(input_dict_force)['mae']
                 
-            return energy_mae + p * force_mae, energy_mae, force_mae
+            return energy_mae + 100 * force_mae, energy_mae, force_mae
             

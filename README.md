@@ -1,6 +1,5 @@
 # eIP
 
-
 **This is the official implementation for the paper: "Evidential Deep Learning for Interatomic Potential ".**
 
 * [Overview](#overview)
@@ -49,25 +48,3 @@ Python 3.9.15 has been tested.
 In `eIP.ipynb`,  we have demonstrated the training process of the eIP model using the small molecule dataset as an example, as described in the article. The modifications to the parameters and the selection of datasets involved in the article are as follows:
 
 By modifying the test.py, you can achieve changes to the hyperparameters in eIP.
-
-### Download the pre-train dataset to Pretrain_dataset and save processed files to Pretrain_dataset:
-
-```
- python xyz2pt.py
-```
-
-### Pre-training on MD17
-
-**The model is pre-trained on the MD17 dataset, which consists of MD trajectories of small organic molecules with reference values of energy and forces calculated by ab initio molecular dynamics (AIMD) simulations. We use a pre-training dataset of 160,000 configurations sampled from CMD trajectories of eight different organic molecules.**
-
-```
- python pretraining.py
-```
-
-### Fine-tuning on MD17 Datasets(Benzene2017 Dataset)
-
-```
- python finetune.py
-```
-
-**For other datasets in MD17 Datasets, you can change the **`data_name` in the 15 line of the `finetune.py` (replace the 'benzene2017' with 'aspirin', 'ethanol', 'malonaldehyde', 'naphthalene', 'salicylic', 'toluene', 'uracil').

@@ -1,15 +1,15 @@
 import torch
+from MD17 import MD17
 from evaluation import ThreeDEvaluator
-# from dig.threedgraph.method import run
-from run import run
 from PaiNN import PainnModel
+from run import run
 import logging
 import time
 
 if  __name__ == '__main__':
     logger = logging.getLogger()
     time = time.asctime()
-    logger.setLevel(logging.INFO)   # 设置打印级别
+    logger.setLevel(logging.INFO)  
     formatter = logging.Formatter('%(asctime)s %(filename)s %(funcName)s [line:%(lineno)d] %(levelname)s %(message)s')
     sh = logging.StreamHandler()
     sh.setFormatter(formatter)
@@ -19,37 +19,34 @@ if  __name__ == '__main__':
     logger.addHandler(fh)
     logging.info('Start print log......')
 
-torch.manual_seed(2048)
-torch.backends.cudnn.deterministic = True
-torch.backends.cudnn.benchmark = False
 
 # Load the dataset and split
-# train_dataset = torch.load('/mnt/data/ai4phys/xuhan/quantile_evidential_deep_learning/dataset/newliquid_shifted.pt')[:1000]
-train_dataset = torch.load('/root/xuhan/quantile_evidential_deep_learning/dataset/1k+1k.pt')[:6000] #2200
-for i in range(len(train_dataset)):
-    train_dataset[i].cell = train_dataset[i].cell.unsqueeze(0)
+dataset_md17 = MD17(root='dataset', name='aspirin')
+split_idx_md17 = dataset_md17.get_idx_split(len(dataset_md17.data.y), train_size=1000, valid_size=1000, seed=42)
+train_dataset, valid_dataset = dataset_md17[split_idx_md17['train']], dataset_md17[split_idx_md17['valid']]
+train_energy_trans = torch.mean(torch.tensor([data.y for data in dataset_md17])).item()
 
-valid_dataset = torch.load('/root/xuhan/quantile_evidential_deep_learning/dataset/5th.pt')[:200]
-for i in range(len(valid_dataset)):
-    valid_dataset[i].cell = valid_dataset[i].cell.unsqueeze(0)
 
-test_dataset = torch.load('/root/xuhan/quantile_evidential_deep_learning/dataset/liquid_aimd.pt')[500:550] #/mnt/workspace/tangchenyu/dataset/Water/uncertainty/water_bias_2k_shifted.pt
-for i in range(len(test_dataset)):
-    test_dataset[i].cell = test_dataset[i].cell.unsqueeze(0)
+dataset_md17_salicylic = MD17(root='dataset', name='salicylic')
+split_idx_md17_asl = dataset_md17.get_idx_split(len(dataset_md17.data.y), train_size=1000, valid_size=1000, seed=42)
+test_dataset = dataset_md17_salicylic[split_idx_md17_asl['test']][:1000]
+test_energy_trans = torch.mean(torch.tensor([data.y for data in dataset_md17_salicylic])).item()
+
+
 
 device = 'cuda:0'
 
 # Define model, loss, and evaluation
-model = PainnModel(num_interactions=3,hidden_state_size=128,cutoff=5.0,pdb=True)
-
+# model = SchNet(energy_and_force=True, cutoff=5.0, num_layers=6, hidden_channels=128, out_channels=1, num_filters=128, num_gaussians=50)
+model = PainnModel(num_interactions=3,hidden_state_size=128,cutoff=5.0,pdb=False)
 loss_func = torch.nn.L1Loss()
 evaluation = ThreeDEvaluator()
 
 # Train and evaluate
 run3d = run()
 run3d.run(device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation,
-          mol_name = '6th', energy_trans=[0, 0, 0], convert=1,
-          epochs=2000, batch_size=2, vt_batch_size=8, lr=0.0001, lr_decay_factor=0.5, lr_decay_step_size=300,
+          mol_name = 'small molecule', energy_trans=[train_energy_trans, train_energy_trans, test_energy_trans], convert=1, LAMBDA = 1, THETA = 0.1, q = 0.4,
+          epochs=30, batch_size=2, vt_batch_size=4, lr=0.0005, lr_decay_factor=0.5, lr_decay_step_size=200,
           energy_and_force=True,
-          save_dir='/root/xuhan/quantile_evidential_deep_learning/model/painn/evidence/newwater_uncertain/altest2/'
+          save_dir='./'
           )
