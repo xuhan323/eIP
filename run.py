@@ -93,8 +93,12 @@ class run():
     def __init__(self):
         pass
         
-    def run(self, device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation, epochs=500, batch_size=32, vt_batch_size=32, lr=0.0005, lr_decay_factor=0.5, lr_decay_step_size=50, weight_decay=0, 
-        energy_and_force=False, save_dir='', log_dir='', energy_trans=[0, 0, 0], convert=1, LAMBDA = 1, THETA = 0.1, q = 0.4, mol_name=None):
+    def run(device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation,
+          mol_name = 'small molecule', energy_trans=[train_energy_trans, train_energy_trans, test_energy_trans], convert=1, 
+          LAMBDA = 1, THETA = 0.1, q = 0.4,
+          epochs=30, batch_size=2, vt_batch_size=4, lr=0.0005, lr_decay_factor=0.5, lr_decay_step_size=200,
+          energy_and_force=True,
+          save_dir='./'):
         r"""
         The run script for training and validation.
         
@@ -103,8 +107,8 @@ class run():
             train_dataset: Training data.
             valid_dataset: Validation data.
             test_dataset: Test data.
-            model: Which 3DGN model to use. Should be one of the SchNet, DimeNetPP, and SphereNet.
-            loss_func (function): The used loss funtion for training.
+            model: The eIP model.
+            loss_func (function): The used loss funtion for Machine Learning Interatomic Potential.
             evaluation (function): The evaluation function. 
             epochs (int, optinal): Number of total training epochs. (default: :obj:`500`)
             batch_size (int, optinal): Number of samples in each minibatch in training. (default: :obj:`32`)

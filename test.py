@@ -45,7 +45,8 @@ evaluation = ThreeDEvaluator()
 # Train and evaluate
 run3d = run()
 run3d.run(device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation,
-          mol_name = 'small molecule', energy_trans=[train_energy_trans, train_energy_trans, test_energy_trans], convert=1, LAMBDA = 1, THETA = 0.1, q = 0.4,
+          mol_name = 'small molecule', energy_trans=[train_energy_trans, train_energy_trans, test_energy_trans], convert=1, 
+          LAMBDA = 1, THETA = 0.1, q = 0.4,
           epochs=30, batch_size=2, vt_batch_size=4, lr=0.0005, lr_decay_factor=0.5, lr_decay_step_size=200,
           energy_and_force=True,
           save_dir='./'
