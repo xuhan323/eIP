@@ -1,32 +1,34 @@
 Uncertainty-Driven Dynamics (UDD) Molecular Dynamics Simulation
-This repository contains code for performing Molecular Dynamics (MD) simulations using the Uncertainty-Driven Dynamics (UDD) method, integrated with machine learning potentials.
+    This repository contains code for performing Molecular Dynamics (MD) simulations using the Uncertainty-Driven Dynamics (UDD) method, integrated with machine learning potentials.
 
 Overview
-The UDD method enhances traditional MD simulations by leveraging uncertainty estimates from machine learning models to dynamically adjust simulation parameters. This implementation utilizes a neural network potential (PaiNN) to compute atomic forces and uncertainties during the simulation.
+    The UDD method enhances traditional MD simulations by leveraging uncertainty estimates from machine learning models to dynamically adjust simulation parameters. This implementation utilizes a neural network potential (PaiNN) to compute atomic forces and uncertainties during the simulation.
 
 Requirements
-Python 3.x
-ASE (Atomic Simulation Environment)
-PyTorch
-NumPy
+    Python 3.x
+    ASE (Atomic Simulation Environment)
+    PyTorch
+    NumPy
+
 Installation
-Clone the repository:
+    Clone the repository:
 
-bash
+    bash
 
-git clone https://github.com/your_username/udd-md-simulation.git
-cd udd-md-simulation
+    git clone https://github.com/your_username/udd-md.git
+    cd udd-md
+
 Install dependencies:
 
 pip install -r requirements.txt
 
 Usage
-Running a Simulation
-To run a UDD MD simulation, use the UDD_MD_run function defined in udd_md_simulation.py. Modify the parameters as needed:
+    Running a Simulation
+    To run a UDD MD simulation, use the UDD_MD_run function defined in udd_md_simulation.py. Modify the parameters as needed:
 
 Python example:
 
-    from udd_md_simulation import UDD_MD_run
+    from udd_run import UDD_MD_run
     from ase.io import read
 
     # Example usage
@@ -43,7 +45,8 @@ Python example:
     # Run the simulation
     total_steps = UDD_MD_run(atoms, Runtime, PATH, Temp, sigma_cutoff, filename, sampling, dt, tau_t)
     print(f"Simulation completed with {total_steps} steps.")
-    Parameters
+
+Parameters
     atoms: ASE Atoms object containing the initial atomic configuration.
     Runtime: Total runtime of the simulation in femtoseconds.
     PATH: Path to the directory containing the trained model weights.
@@ -55,7 +58,7 @@ Python example:
     tau_t: Relaxation time for temperature coupling in femtoseconds.
 
 Output
-The simulation outputs a trajectory file (trajectory.xyz) containing sampled atomic configurations and logs (log.*.uncerA_*) with energy and uncertainty information.
+    The simulation outputs a trajectory file (trajectory.xyz) containing sampled atomic configurations and logs (log.*.uncerA_*) with energy and uncertainty information.
 
 Contributing
-Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.
+    Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.
