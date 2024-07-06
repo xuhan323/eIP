@@ -110,17 +110,20 @@ class run():
             model: The eIP model.
             loss_func (function): The used loss funtion for Machine Learning Interatomic Potential.
             evaluation (function): The evaluation function. 
-            epochs (int, optinal): Number of total training epochs. (default: :obj:`500`)
+            mol_name (str): The name of dataset or task
+            energy_trans (int, optinal): This value is used to adjust the zero point of potential energy, shifting the energy to around zero.
+            LAMBDA (int): The hyperparamers uese in eIP
+            THETA (int): The hyperparamers uese in eIP
+            q (int): The hyperparamers uese in eIP
+            epochs (int, optinal): Number of total training epochs. 
             batch_size (int, optinal): Number of samples in each minibatch in training. (default: :obj:`32`)
             vt_batch_size (int, optinal): Number of samples in each minibatch in validation/testing. (default: :obj:`32`)
             lr (float, optinal): Initial learning rate. (default: :obj:`0.0005`)
             lr_decay_factor (float, optinal): Learning rate decay factor. (default: :obj:`0.5`)
             lr_decay_step_size (int, optinal): epochs at which lr_initial <- lr_initial * lr_decay_factor. (default: :obj:`50`)
-            weight_decay (float, optinal): weight decay factor at the regularization term. (default: :obj:`0`)
             energy_and_force (bool, optional): If set to :obj:`True`, will predict energy and take the minus derivative of the energy with respect to the atomic positions as predicted forces. (default: :obj:`False`)    
-            p (int, optinal): The forces’ weight for a joint loss of forces and conserved energy during training. (default: :obj:`100`)
             save_dir (str, optinal): The path to save trained models. If set to :obj:`''`, will not save the model. (default: :obj:`''`)
-            log_dir (str, optinal): The path to save log files. If set to :obj:`''`, will not save the log files. (default: :obj:`''`)
+            
         
         """        
 

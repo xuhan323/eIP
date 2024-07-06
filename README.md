@@ -39,8 +39,6 @@ Python 3.9.15 has been tested.
  conda install mamba -n base -c conda-forge
  mamba env create -f environment.yaml
  conda activate eIP
-
-
 ```
 
 # How to run this code:
@@ -51,9 +49,33 @@ In `eIP.ipynb`,  we have demonstrated the training process of the eIP model usin
 
 By modifying the test.py, you can achieve changes to the hyperparameters in eIP.
 
+#### Parameters
+```
+device (torch.device): Device for computation.
+train_dataset: Training data.
+valid_dataset: Validation data.
+test_dataset: Test data.
+model: The eIP model.
+loss_func (function): The used loss funtion for Machine Learning Interatomic Potential.
+evaluation (function): The evaluation function. 
+mol_name (str): The name of dataset or task
+energy_trans (int, optinal): This value is used to adjust the zero point of potential energy, shifting the energy to around zero.
+LAMBDA (int): The hyperparamers uese in eIP
+THETA (int): The hyperparamers uese in eIP
+q (int): The hyperparamers uese in eIP
+epochs (int, optinal): Number of total training epochs. 
+batch_size (int, optinal): Number of samples in each minibatch in training. (default: :obj:`32`)
+vt_batch_size (int, optinal): Number of samples in each minibatch in validation/testing. (default: :obj:`32`)
+lr (float, optinal): Initial learning rate. (default: :obj:`0.0005`)
+lr_decay_factor (float, optinal): Learning rate decay factor. (default: :obj:`0.5`)
+lr_decay_step_size (int, optinal): epochs at which lr_initial <- lr_initial * lr_decay_factor. (default: :obj:`50`)
+energy_and_force (bool, optional): If set to :obj:`True`, will predict energy and take the minus derivative of the energy with respect to the atomic positions as predicted forces. (default: :obj:`False`)    
+save_dir (str, optinal): The path to save trained models. If set to :obj:`''`, will not save the model. (default: :obj:`''`)
+```
+
 ### UDD
 
-To run a UDD MD simulation, use the UDD_MD_run function defined in udd_md_simulation.py. Modify the parameters as needed:
+All the code to run eIP-based UDD are in the folder 'udd-md'. To run a UDD MD simulation, use the UDD_MD_run function defined in udd_md_simulation.py. Modify the parameters as needed:
 
 #### Python example:
 
@@ -79,15 +101,15 @@ print(f"Simulation completed with {total_steps} steps.")
 
 #### Parameters
 ```
-    atoms: ASE Atoms object containing the initial atomic configuration.
-    Runtime: Total runtime of the simulation in femtoseconds.
-    PATH: Path to the directory containing the trained model weights.
-    Temp: Temperature of the system in Kelvin.
-    sigma_cutoff: Cutoff value for uncertainty in atomic forces.
-    filename: Name of the trajectory file to save sampled configurations.
-    sampling: Interval at which configurations are sampled and saved.
-    dt: Timestep for the simulation in femtoseconds.
-    tau_t: Relaxation time for temperature coupling in femtoseconds.
+atoms: ASE Atoms object containing the initial atomic configuration.
+Runtime: Total runtime of the simulation in femtoseconds.
+PATH: Path to the directory containing the trained model weights.
+Temp: Temperature of the system in Kelvin.
+sigma_cutoff: Cutoff value for uncertainty in atomic forces.
+filename: Name of the trajectory file to save sampled configurations.
+sampling: Interval at which configurations are sampled and saved.
+dt: Timestep for the simulation in femtoseconds.
+tau_t: Relaxation time for temperature coupling in femtoseconds.
 ```
 
 #### Output
