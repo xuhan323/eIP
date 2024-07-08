@@ -50,6 +50,7 @@ In `eIP.ipynb`,  we have demonstrated the training process of the eIP model usin
 By modifying the test.py, you can achieve changes to the hyperparameters in eIP.
 
 #### Parameters
+
 ```
 device (torch.device): Device for computation.
 train_dataset: Training data.
@@ -69,13 +70,13 @@ vt_batch_size (int, optinal): Number of samples in each minibatch in validation/
 lr (float, optinal): Initial learning rate. (default: :obj:`0.0005`)
 lr_decay_factor (float, optinal): Learning rate decay factor. (default: :obj:`0.5`)
 lr_decay_step_size (int, optinal): epochs at which lr_initial <- lr_initial * lr_decay_factor. (default: :obj:`50`)
-energy_and_force (bool, optional): If set to :obj:`True`, will predict energy and take the minus derivative of the energy with respect to the atomic positions as predicted forces. (default: :obj:`False`)    
+energy_and_force (bool, optional): If set to :obj:`True`, will predict energy and take the minus derivative of the energy with respect to the atomic positions as predicted forces. (default: :obj:`False`)  
 save_dir (str, optinal): The path to save trained models. If set to :obj:`''`, will not save the model. (default: :obj:`''`)
 ```
 
 ### UDD
 
-All the code to run eIP-based UDD are in the folder 'udd-md'. To run a UDD MD simulation, use the UDD_MD_run function defined in udd_md_simulation.py. Modify the parameters as needed:
+All the code to run eIP-based UDD are in the folder 'udd-md'. To run a UDD MD simulation, use the `UDD_MD_run` function defined in `udd_run.py`. Modify the parameters as needed:
 
 #### Python example:
 
@@ -100,6 +101,7 @@ print(f"Simulation completed with {total_steps} steps.")
 ```
 
 #### Parameters
+
 ```
 atoms: ASE Atoms object containing the initial atomic configuration.
 Runtime: Total runtime of the simulation in femtoseconds.
@@ -114,9 +116,8 @@ tau_t: Relaxation time for temperature coupling in femtoseconds.
 
 #### Output
 
-The simulation outputs a trajectory file (trajectory.xyz) containing sampled atomic configurations and logs (log.*.uncerA_*) with energy and uncertainty information.
+The simulation outputs a trajectory file (`trajectory.xyz`) containing sampled atomic configurations and logs (`log.*.uncerA_*`) with energy and uncertainty information.
 
 #### Contributing
 
 Contributions are welcome! For major changes, please open an issue first to discuss what you would like to change.
-
