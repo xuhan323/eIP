@@ -93,12 +93,12 @@ class run():
     def __init__(self):
         pass
         
-    def run(device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation,
-          mol_name = 'small molecule', energy_trans=[train_energy_trans, train_energy_trans, test_energy_trans], convert=1, 
-          LAMBDA = 1, THETA = 0.1, q = 0.4,
-          epochs=30, batch_size=2, vt_batch_size=4, lr=0.0005, lr_decay_factor=0.5, lr_decay_step_size=200,
-          energy_and_force=True,
-          save_dir='./'):
+    def run(self, device, train_dataset, valid_dataset, test_dataset, model, loss_func, evaluation,
+          mol_name, energy_trans, convert, 
+          LAMBDA, THETA, q,
+          epochs, batch_size, vt_batch_size, lr, lr_decay_factor, lr_decay_step_size,
+          energy_and_force,
+          save_dir, log_dir='',):
         r"""
         The run script for training and validation.
         
@@ -141,7 +141,7 @@ class run():
         logging.info(f'#Params: {num_params}')
         logging.info(f'#HyperParams: theta: {self.THETA}, lambda: {self.LAMBDA}, q: {self.q}')
         logging.info(f'#modle-setting: task_mol:{mol_name},  epochs:{epochs}, train_bs:{batch_size}, infer_bs:{vt_batch_size}, initial_lr:{lr}, convert:{self.convert}, trans:{energy_trans} ' )
-        optimizer = AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+        optimizer = AdamW(model.parameters(), lr=lr, weight_decay=0)
         num_steps = len(train_loader) * epochs
         scheduler = StepLR(optimizer, step_size=lr_decay_step_size, gamma=lr_decay_factor) 
             
