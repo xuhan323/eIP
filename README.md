@@ -46,7 +46,6 @@ Python 3.9.15 has been tested.
 
 Under normal network conditions, it takes 5-10 minutes, depending on fluctuations in network speed, to be faster or slower.
 
-about 10-15 minutes 
 
 # How to run this code:
 
