@@ -31,6 +31,7 @@ This code base is supported for Linux and has been tested on the following syste
 
 Python 3.9.15 has been tested.
 
+
 # Installation Guide:
 
 ### Install dependencies
@@ -41,6 +42,12 @@ Python 3.9.15 has been tested.
  conda activate eIP
 ```
 
+### Time Cosuming
+
+Under normal network conditions, it takes 5-10 minutes, depending on fluctuations in network speed, to be faster or slower.
+
+about 10-15 minutes 
+
 # How to run this code:
 
 ### Notebook (Demo)
@@ -48,6 +55,10 @@ Python 3.9.15 has been tested.
 In `eIP.ipynb`,  we have demonstrated the training process of the eIP model using the small molecule dataset as an example, as described in the article. The modifications to the parameters and the selection of datasets involved in the article are as follows:
 
 By modifying the test.py, you can achieve changes to the hyperparameters in eIP.
+
+### Time Cosuming
+
+In the demo file, each epoch takes approximately 40 seconds (tested on an RTX 4090), and this time may fluctuate depending on the complexity of the data (molecular configurations), the batch size, and other hyperparameters.
 
 #### Parameters
 
