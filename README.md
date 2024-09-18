@@ -42,7 +42,7 @@ Python 3.9.15 has been tested.
  conda activate eIP
 ```
 
-### Time Cosuming
+### Time Consuming
 
 Under normal network conditions, it takes 5-10 minutes, depending on fluctuations in network speed, to be faster or slower.
 
@@ -55,7 +55,7 @@ In `eIP.ipynb`,  we have demonstrated the training process of the eIP model usin
 
 By modifying the test.py, you can achieve changes to the hyperparameters in eIP.
 
-### Time Cosuming
+### Time Consuming
 
 In the demo file, each epoch takes approximately 40 seconds (tested on an RTX 4090), and this time may fluctuate depending on the complexity of the data (molecular configurations), the batch size, and other hyperparameters.
 
