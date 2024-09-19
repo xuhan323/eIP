@@ -42,6 +42,16 @@ Python 3.9.15 has been tested.
  conda activate eIP
 ```
 
+Alternatively, if limited by account permissions, network access, server system version, and other issues, you can try the following simpler installation methods through `pip`.
+
+```
+ pip3 install torch torchvision torchaudio
+ pip install torch_geometric
+ pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.4.0+cu121.html
+ 
+```
+
+
 ### Time Consuming
 
 Under normal network conditions, it takes 5-10 minutes, depending on fluctuations in network speed, to be faster or slower.
