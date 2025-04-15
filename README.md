@@ -71,7 +71,7 @@ Python 3.9.15 has been tested.
 ├── PDMS.cif # Crystal information file for PDMS
 ├── run.py # Main execution script
 ├── test_eIP_silica.py # Uncertainty evaluation script for the silica glass dataset
-├── md_udd.ipynb # 用于计算不确定度计算的展示notebook
+├── md_udd.ipynb # A Jupyter Notebook for molecular dynamics and uncertainty driven dynamics demonstrations
 ├── test_md.py # Molecular dynamics testing script
 ├── train_eip.py # Model training script
 └── udd_run.py # Script for uncertainty-driven dynamics
