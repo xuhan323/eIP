@@ -38,7 +38,7 @@ Python 3.9.15 has been tested.
  pip install torch torchvision torchaudio
  pip install torch_geometric
  pip install pyg_lib torch_scatter torch_sparse torch_cluster torch_spline_conv -f https://data.pyg.org/whl/torch-2.4.0+cu121.html
- pip install ase
+ pip install ase tensorboard torch_warmup
  pip install -U scikit-learn
 ```
 
@@ -102,8 +102,6 @@ jupyter notebook md_udd.ipynb
 ```
 
 This notebook demonstrates the molecular dynamics simulation process for both materials.
-
-
 
 
 ## Contact
