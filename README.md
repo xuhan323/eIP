@@ -16,7 +16,7 @@ Machine learning interatomic potentials (MLIPs) have been widely used to facilit
 
 ## Hardware requirements
 
-A GPU is required for running this code base, RTX 3090 card and RTX 4090 have been tested.
+A GPU is required for running this code base, RTX 3090 and RTX 4090 have been tested.
 
 ## Software requirements
 
@@ -107,3 +107,11 @@ This notebook demonstrates the molecular dynamics simulation process for both ma
 ## Contact
 
 For any questions or issues, please open an issue in the repository.
+
+
+
+## Citation
+
+If you use this code or our work in your research, please cite our paper:
+
+[Evidential Deep Learning for Interatomic Potentials](https://arxiv.org/abs/2407.13994)
